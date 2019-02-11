@@ -14,15 +14,15 @@ class ProductList extends Component {
     }
 
     renderProducts() {
-        if (!this.props.productsData) {
+        if (!this.props.productsData || this.props.productsData.length == 0) {
             return <div></div>  // in case of null data for product list
         }
-        this.productMaxCount = this.props.productsData.data.count; // setting the max product count
-   
-        return this.props.productsData.data.productsData.map((prodData) => { // iterating over the list of products
+
+        this.productMaxCount = this.props.productsData.count; // setting the max product count
+        return this.props.productsData.redProd.map((prodData) => { // iterating over the list of products
             return (
                 <div key={prodData.id}>
-                    <ProductListItem  productListData={prodData} />
+                    <ProductListItem productListData={prodData} />
                 </div>
 
             )
@@ -41,7 +41,7 @@ class ProductList extends Component {
     render() {
         return (
             <div >
-                <div className="row"> {this.renderProducts()}</div>
+                <div className="row" id="productList"> {this.renderProducts()}</div>
 
                 {this.renderLoaderDiv()}
             </div>
@@ -55,12 +55,13 @@ class ProductList extends Component {
 
     isBottom(el) {
         //method to check if the bottom of the page was reached
-        return  window.innerHeight + window.scrollY >= document.body.offsetHeight;
+        const loader = document.querySelector(".loader");
+        return window.innerHeight + window.scrollY >= document.body.offsetHeight - (loader.clientHeight / 2);
     }
 
     componentDidMount() {
         //registering an event listener when the component mounted
-        document.addEventListener('scroll', this.trackScrolling);
+        document.addEventListener('scroll', this.debounce(this.trackScrolling, 1000));
     }
 
     componentWillUnmount() {
@@ -68,14 +69,32 @@ class ProductList extends Component {
         document.removeEventListener('scroll', this.trackScrolling);
     }
 
+    debounce(func, wait, immediate) {
+        var timeout;
+        return function () {
+            var context = this, args = arguments;
+            var later = function () {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    };
+
     trackScrolling = () => {
-        if (this.isBottom(window) && !this.productLimitReached) { //if the botton is reached and there is more to display
+
+        if (this.isBottom((document.querySelector('#productList'))) && !this.productLimitReached) { //if the botton is reached and there is more to display
             this.productCount = this.productCount + appConstants.PROD_COUNT; // updating the no of products required
             this.props.getProductsData(this.productCount); //make a get call to fetch products
+
             if (this.productCount >= this.productMaxCount) { // if the count increases above the limit 
                 this.productLimitReached = true;
                 document.removeEventListener('scroll', this.trackScrolling);
             }
+
         }
     };
 }

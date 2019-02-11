@@ -4,7 +4,7 @@ import './home.css';
 export default class Home extends Component{
     render(){
         return(
-         <div className="container">
+         <div className="container" id="parent">
            <ProductList />
          </div>
         );
