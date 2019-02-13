@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import App from './App';
 import { MemoryRouter } from 'react-router-dom';
 import Home from './home/components/home';
@@ -63,11 +62,3 @@ describe('Test cases for app component', () => {
     wrapper.unmount();
   });
 })
-
-// it('renders without crashing', () => {
-//   const div = document.createElement('div');
-//   ReactDOM.render(<App />, div);
-//   ReactDOM.unmountComponentAtNode(div);
-// });
-
-//route testing to be done here
